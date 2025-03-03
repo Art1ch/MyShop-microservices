@@ -1,6 +1,8 @@
-﻿namespace UserService.Core.Entities
+﻿using Shared.Entities;
+
+namespace UserService.Core.Entities
 {
-    public class UserEntity : EntityBase
+    public class UserEntity : BaseEntity
     {
         public string Name { get; set; }
         public int? Age { get; set; }

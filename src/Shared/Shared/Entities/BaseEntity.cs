@@ -1,6 +1,6 @@
-﻿namespace UserService.Core.Entities
+﻿namespace Shared.Entities
 {
-    public abstract class EntityBase
+    public abstract class BaseEntity 
     {
         public Guid Id { get; set; }
         public DateTime CreatedTime { get; set; }

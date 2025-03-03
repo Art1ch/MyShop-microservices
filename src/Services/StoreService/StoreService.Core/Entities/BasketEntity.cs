@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Shared.Entities;
 
 namespace StoreService.Core.Entities
 {
-    public class BasketEntity : EntityBase
+    public class BasketEntity : BaseEntity
     {
         public List<ProductEntity> Products { get; set; }
         public decimal Price { get; set; }

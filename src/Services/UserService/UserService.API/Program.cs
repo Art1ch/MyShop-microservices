@@ -9,6 +9,7 @@ using EventBus.EventBus.Interface;
 using EventBus.EventBus.Implementations;
 using MassTransit.Configuration;
 using Microsoft.Extensions.Options;
+using UserService.API.Extensions;
 
 
 namespace UserService.API
@@ -23,45 +24,11 @@ namespace UserService.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            builder.Services.AddDbContext<UserContext>(options =>
-            {
-                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
-
-            builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddTransient<IEventBus, EventBusImplementation>();
-            builder.Services.AddMediatR(options =>
-            {
-                options.RegisterServicesFromAssembly(typeof(Program).Assembly);
-
-                options.RegisterServicesFromAssembly(typeof(UserService.Application.Commands.CreateUser.CreateUserCommandHandler).Assembly);
-                options.RegisterServicesFromAssembly(typeof(UserService.Application.Commands.DeleteUser.DeleteUserCommandHandler).Assembly);
-                options.RegisterServicesFromAssembly(typeof(UserService.Application.Commands.UpdateUser.UpdateUserCommandHandler).Assembly);
-
-                options.RegisterServicesFromAssembly(typeof(UserService.Application.Queries.GetAll.GetAllQueryHandler).Assembly);
-                options.RegisterServicesFromAssembly(typeof(UserService.Application.Queries.GetUserById.GetUserByIdQueryHandler).Assembly);
-                options.RegisterServicesFromAssembly(typeof(UserService.Application.Queries.GetUserByName.GetUserByNameQueryHandler).Assembly);
-            });
-
-            builder.Services.Configure<MessageBrokerSettings>(
-                builder.Configuration.GetSection("MessageBrokerSettings"));
-            builder.Services.AddSingleton(sp =>
-            sp.GetRequiredService<IOptions<MessageBrokerSettings>>().Value);
-
-            builder.Services.AddMassTransit((busConfigurator) =>
-            {
-                busConfigurator.SetKebabCaseEndpointNameFormatter();
-                busConfigurator.UsingRabbitMq((context, configurator) =>
-                {
-                    MessageBrokerSettings settings = context.GetRequiredService<MessageBrokerSettings>();
-                    configurator.Host(new Uri(settings.Host), h =>
-                    {
-                        h.Username(settings.Username);
-                        h.Password(settings.Password);
-                    });
-                    configurator.ConfigureEndpoints(context);                    
-                });
-            });
+            builder.AddDatabase();
+            builder.AddRepository();
+            builder.AddEventBus();
+            builder.AddMediatR();
+            builder.AddMessageBroker();
 
             var app = builder.Build();
 
