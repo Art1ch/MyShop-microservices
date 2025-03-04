@@ -1,10 +1,12 @@
 ﻿using MediatR;
+using OneOf;
+using Shared.Results;
 using StoreService.Application.Contracts;
 using StoreService.Core.Entities;
 
 namespace StoreService.Application.Commands.Product.CreateProduct
 {
-    public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Guid>
+    public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, OneOf<Success<Guid>, Failed>>
     {
         private readonly IProductRepository _productRepository;
 
@@ -13,7 +15,7 @@ namespace StoreService.Application.Commands.Product.CreateProduct
             _productRepository = productRepository;
         }
 
-        public async Task<Guid> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<Guid>, Failed>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
             var currentTime = DateTime.UtcNow;
             var product = new ProductEntity()

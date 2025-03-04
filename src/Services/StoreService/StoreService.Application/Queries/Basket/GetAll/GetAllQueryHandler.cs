@@ -1,10 +1,12 @@
 ﻿using MediatR;
+using OneOf;
+using Shared.Results;
 using StoreService.Application.Contracts;
 using StoreService.Core.Entities;
 
 namespace StoreService.Application.Queries.Basket.GetAll
 {
-    public class GetAllQueryHandler : IRequestHandler<GetAllQuery, List<BasketEntity>>
+    public class GetAllQueryHandler : IRequestHandler<GetAllQuery, OneOf<Success<List<BasketEntity>>, Failed>>
     {
         private readonly IBasketRepository _basketRepository;
 
@@ -13,7 +15,7 @@ namespace StoreService.Application.Queries.Basket.GetAll
             _basketRepository = basketRepository;
         }
 
-        public async Task<List<BasketEntity>> Handle(GetAllQuery request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<List<BasketEntity>>, Failed>> Handle(GetAllQuery request, CancellationToken cancellationToken)
         {
             return await _basketRepository.GetAllAsync(cancellationToken);
         }

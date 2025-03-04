@@ -1,9 +1,10 @@
 ﻿using MediatR;
-using StoreService.Core.Entities;
+using OneOf;
+using Shared.Results;
 
 namespace StoreService.Application.Commands.Basket.AddProduct
 {
-    public class AddProductToBasketCommand : IRequest
+    public class AddProductToBasketCommand : IRequest<OneOf<Success, Failed>>
     {
         public Guid BasketId { get; set; }
         public Guid ProductId { get; set; }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UserService.Application.Commands.CreateUser;
-using UserService.Application.Commands.DeleteUser;
-using UserService.Application.Commands.UpdateUser;
+using OneOf;
+using Shared.Results;
 using UserService.Application.Contracts.Repository;
 using UserService.Core.Entities;
 using UserService.Infrastructure.Context;
@@ -16,35 +15,41 @@ namespace UserService.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<Guid> CreateUserAsync(UserEntity user, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<Guid>, Failed>> CreateUserAsync(UserEntity user, CancellationToken cancellationToken)
         {
             await _context.Users.AddAsync(user, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
-            return user.Id;
+            return new Success<Guid>(user.Id);
         }
 
-        public async Task DeleteUserAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<OneOf<Success, Failed>> DeleteUserAsync(Guid id, CancellationToken cancellationToken)
         {
             await _context.Users.Where(u => u.Id == id).ExecuteDeleteAsync(cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
+            return new Success();
         }
 
-        public async Task<IReadOnlyList<UserEntity>> GetAllAsync(CancellationToken cancellationToken)
+        public async Task<OneOf<Success<List<UserEntity>>, Failed>> GetAllAsync(CancellationToken cancellationToken)
         {
-            return await _context.Users.AsNoTracking().ToListAsync(cancellationToken);
+            var users = await _context.Users.AsNoTracking().ToListAsync(cancellationToken);
+            return new Success<List<UserEntity>>(users);
         }
 
-        public async Task<UserEntity?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<UserEntity>, Failed>> GetUserByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
+            if (user == null) { return new Failed("User is null"); }
+            return new Success<UserEntity>(user);
         }
 
-        public async Task<UserEntity?> GetUserByNameAsync(string name, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<UserEntity>, Failed>> GetUserByNameAsync(string name, CancellationToken cancellationToken)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Name == name, cancellationToken);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Name == name, cancellationToken);
+            if (user == null) { return new Failed("User is null"); }
+            return new Success<UserEntity>(user);
         }
 
-        public async Task<Guid> UpdateUserAsync(UserEntity user, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<Guid>, Failed>> UpdateUserAsync(UserEntity user, CancellationToken cancellationToken)
         {
             await _context.Users
             .Where(u => u.Id == user.Id)
@@ -58,7 +63,7 @@ namespace UserService.Infrastructure.Repository
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            return user.Id;
+            return new Success<Guid>(user.Id);
         }
     }
 }

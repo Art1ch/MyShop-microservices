@@ -1,4 +1,6 @@
 ﻿using MongoDB.Driver;
+using OneOf;
+using Shared.Results;
 using StoreService.Application.Contracts;
 using StoreService.Core.Entities;
 using StoreService.Infrastructure.Context;
@@ -15,93 +17,103 @@ namespace StoreService.Infrastructure.Repositories
             _productRepository = repository;   
         }
 
-        public async Task AddProductToBasket(Guid basketId, Guid productId, int amount, CancellationToken cancellationToken)
+        public async Task<OneOf<Success, Failed>> AddProductToBasket(Guid basketId, Guid productId, int amount, CancellationToken cancellationToken)
         {
             var basket = await GetBasketByIdAsync(basketId, cancellationToken);
-            if (basket is null) { return; } // Raise Exception
+            if (basket.IsT1) { return new Failed(); }
 
             var warehouseProduct = await _productRepository.GetProductByIdAsync(productId);
-            if (warehouseProduct is null) { return; } // Raise Exception
+            if (warehouseProduct.IsT1) { return new Failed(); }
+            
 
             var product = new ProductEntity
             {
                 Id = basketId,
-                Description = warehouseProduct.Description,
-                Name = warehouseProduct.Name,
+                Description = warehouseProduct.AsT0.Value!.Description,
+                Name = warehouseProduct.AsT0.Value!.Name,
                 Amount = amount,
-                Price = warehouseProduct.Price,
-                CreatedTime = warehouseProduct.CreatedTime,
-                ModifiedTime = warehouseProduct.ModifiedTime
+                Price = warehouseProduct.AsT0.Value!.Price,
+                CreatedTime = warehouseProduct.AsT0.Value!.CreatedTime,
+                ModifiedTime = warehouseProduct.AsT0.Value!.ModifiedTime
             };
 
-            basket.Products.Add(product);
-            warehouseProduct.Amount -= amount;
+            basket.AsT0.Value!.Products.Add(product);
+            warehouseProduct.AsT0.Value!.Amount -= amount;
 
-            basket.Price += product.Price * product.Amount; 
+            basket.AsT0.Value!.Price += product.Price * product.Amount; 
 
-            await UpdateBasketAsync(basket, cancellationToken);
-            await _productRepository.UpdateProductAsync(warehouseProduct, cancellationToken);
+            await UpdateBasketAsync(basket.AsT0.Value, cancellationToken);
+            await _productRepository.UpdateProductAsync(warehouseProduct.AsT0.Value!, cancellationToken);
+
+            return new Success();
         }
 
-        public Task UpdateProductInBasketAsync(Guid basketId, Guid productId, int amount, CancellationToken cancellation = default)
+        public Task<OneOf<Success, Failed>> UpdateProductInBasketAsync(Guid basketId, Guid productId, int amount, CancellationToken cancellation = default)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException(); // I'm too lazy to do this
         }
 
-        public async Task DeleteBasketAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<OneOf<Success, Failed>> DeleteBasketAsync(Guid id, CancellationToken cancellationToken)
         {
             var basket = await GetBasketByIdAsync(id);
-            foreach(var product in basket.Products)
+            foreach(var product in basket.AsT0.Value!.Products)
             {
                 var warehouseProduct = await _productRepository.GetProductByIdAsync(product.Id);
-                warehouseProduct.Amount += product.Amount;
+                warehouseProduct.AsT0.Value!.Amount += product.Amount;
             }
             var filter = Builders<BasketEntity>.Filter.Eq("Id", id);
 
             await _context.Baskets.DeleteOneAsync(filter, cancellationToken);
+
+            return new Success();
         }
 
-        public async Task<Guid> CreateBasketAsync(BasketEntity basket, CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success<Guid>, Failed>> CreateBasketAsync(BasketEntity basket, CancellationToken cancellationToken=default)
         {
             await _context.Baskets.InsertOneAsync(basket, cancellationToken: cancellationToken);
-            return basket.Id;
+            return new Success<Guid>(basket.Id);
         }
 
-        public async Task DeleteProductFromBasketAsync(Guid basketId, Guid productId, CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success,Failed>> DeleteProductFromBasketAsync(Guid basketId, Guid productId, CancellationToken cancellationToken=default)
         {
             var basket = await GetBasketByIdAsync(basketId, cancellationToken);
-            if (basket is null) { return; } // Raise Exception
+            if (basket.IsT1) { return new Failed(); } 
             var warehouseProduct = await _productRepository.GetProductByIdAsync(productId, cancellationToken);
-            if (warehouseProduct is null) { return; } // Raise Exception
+            if (warehouseProduct.IsT1) { return new Failed(); }
 
-            var basketProduct = basket.Products.FirstOrDefault(p => p.Id == productId);
-            if (basketProduct is null) { return;} // Raise Exception
+            var basketProduct = basket.AsT0.Value!.Products.FirstOrDefault(p => p.Id == productId);
+            if (basketProduct is null) { return new Failed();}
 
-            basket.Products.Remove(basketProduct);
-            basket.Price -= basketProduct.Price * basketProduct.Amount;
+            basket.AsT0.Value!.Products.Remove(basketProduct);
+            basket.AsT0.Value!.Price -= basketProduct.Price * basketProduct.Amount;
 
-            warehouseProduct.Amount += basketProduct.Amount;
+            warehouseProduct.AsT0.Value!.Amount += basketProduct.Amount;
 
-            await UpdateBasketAsync(basket, cancellationToken);
-            await _productRepository.UpdateProductAsync(warehouseProduct, cancellationToken);
+            await UpdateBasketAsync(basket.AsT0.Value!, cancellationToken);
+            await _productRepository.UpdateProductAsync(warehouseProduct.AsT0.Value, cancellationToken);
+
+            return new Success();
 
         }
 
-        public async Task<List<BasketEntity>> GetAllAsync(CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success<List<BasketEntity>>, Failed>> GetAllAsync(CancellationToken cancellationToken=default)
         {
-            return await _context.Baskets.Find(_ => true).ToListAsync();
+            var baskets = await _context.Baskets.Find(_ => true).ToListAsync();
+            return new Success<List<BasketEntity>>(baskets);
         }
 
-        public async Task<BasketEntity?> GetBasketByIdAsync(Guid id, CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success<BasketEntity>, Failed>> GetBasketByIdAsync(Guid id, CancellationToken cancellationToken=default)
         {
             var filter = Builders<BasketEntity>.Filter.Eq("Id", id);
 
             var basket = await _context.Baskets.Find(filter).FirstOrDefaultAsync(cancellationToken);
 
-            return basket;
+            if (basket is null) { return new Failed(); }
+
+            return new Success<BasketEntity>(basket);
         }
 
-        public async Task<Guid> UpdateBasketAsync(BasketEntity basket, CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success<Guid>, Failed>> UpdateBasketAsync(BasketEntity basket, CancellationToken cancellationToken=default)
         {
             var updateDefinition = Builders<BasketEntity>.Update
                 .Set("Price", basket.Price)
@@ -112,7 +124,7 @@ namespace StoreService.Infrastructure.Repositories
 
             await _context.Baskets.UpdateOneAsync(filter, updateDefinition, cancellationToken: cancellationToken);
 
-            return basket.Id;
+            return new Success<Guid>(basket.Id);
         }
 
     }

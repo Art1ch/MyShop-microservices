@@ -1,10 +1,12 @@
 ﻿using MediatR;
+using OneOf;
+using Shared.Results;
 using UserService.Application.Contracts.Repository;
 using UserService.Core.Entities;
 
 namespace UserService.Application.Commands.UpdateUser
 {
-    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, Guid>
+    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, OneOf<Success<Guid>, Failed>>
     {
         private readonly IUserRepository _userRepository;
 
@@ -12,7 +14,7 @@ namespace UserService.Application.Commands.UpdateUser
         {
             _userRepository = userRepository;
         }
-        public async Task<Guid> Handle(UpdateUserCommand request, CancellationToken cancellationToken = default)
+        public async Task<OneOf<Success<Guid>, Failed>> Handle(UpdateUserCommand request, CancellationToken cancellationToken = default)
         {
             var user = new UserEntity()
             {

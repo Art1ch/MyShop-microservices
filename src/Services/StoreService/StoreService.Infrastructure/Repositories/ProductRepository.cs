@@ -1,5 +1,6 @@
-﻿using MongoDB.Bson;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
+using OneOf;
+using Shared.Results;
 using StoreService.Application.Contracts;
 using StoreService.Core.Entities;
 using StoreService.Infrastructure.Context;
@@ -14,33 +15,39 @@ namespace StoreService.Infrastructure.Repositories
         {
             _context = context;
         }
-        public async Task<Guid> CreateProductAsync(ProductEntity product, CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success<Guid>, Failed>> CreateProductAsync(ProductEntity product, CancellationToken cancellationToken=default)
         {
             await _context.Products.InsertOneAsync(product);
-            return product.Id;
+            return new Success<Guid>(product.Id);
         }
 
-        public async Task DeleteProductAsync(Guid id, CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success, Failed>> DeleteProductAsync(Guid id, CancellationToken cancellationToken=default)
         {
             var filter = Builders<ProductEntity>.Filter.Eq("Id", id);
 
             await _context.Products.DeleteOneAsync(filter, cancellationToken);
+
+            return new Success();
         }
 
-        public async Task<List<ProductEntity>> GetAllAsync(CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success<List<ProductEntity>>, Failed>> GetAllAsync(CancellationToken cancellationToken=default)
         {
-            return await _context.Products.Find(_ => true).ToListAsync();
+            var products = await _context.Products.Find(_ => true).ToListAsync();
+            if (products is null) { return new Failed(); }
+            return new Success<List<ProductEntity>>(products);
         }
 
-        public async Task<ProductEntity?> GetProductByIdAsync(Guid id, CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success<ProductEntity>, Failed>> GetProductByIdAsync(Guid id, CancellationToken cancellationToken=default)
         {
             var filter = Builders<ProductEntity>.Filter.Eq("Id", id);
 
             var product = await _context.Products.Find(filter).FirstOrDefaultAsync(cancellationToken);
-            return product;
+
+            if (product is null) { return new Failed(); }
+            return new Success<ProductEntity>(product);
         }
 
-        public async Task<Guid> UpdateProductAsync(ProductEntity product, CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success<Guid>, Failed>> UpdateProductAsync(ProductEntity product, CancellationToken cancellationToken=default)
         {
             var updateDefinition = Builders<ProductEntity>.Update
                 .Set("Name", product.Name)
@@ -53,7 +60,7 @@ namespace StoreService.Infrastructure.Repositories
 
             await _context.Products.UpdateOneAsync(filter, updateDefinition, cancellationToken: cancellationToken);
 
-            return product.Id;
+            return new Success<Guid>(product.Id);
         }
     }
 }

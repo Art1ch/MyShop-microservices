@@ -1,10 +1,12 @@
 ﻿using MediatR;
+using OneOf;
 using OrderService.Application.Contracts;
 using OrderService.Core.Entities;
+using Shared.Results;
 
 namespace OrderService.Application.Queries.GetAll
 {
-    public class GetAllQueryHandler : IRequestHandler<GetAllQuery, List<OrderEntity>>
+    public class GetAllQueryHandler : IRequestHandler<GetAllQuery, OneOf<Success<List<OrderEntity>>, Failed>>
     {
         private readonly IOrderRepository _orderRepository;
 
@@ -13,7 +15,7 @@ namespace OrderService.Application.Queries.GetAll
             _orderRepository = orderRepository;
         }
 
-        public async Task<List<OrderEntity>> Handle(GetAllQuery request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<List<OrderEntity>>, Failed>> Handle(GetAllQuery request, CancellationToken cancellationToken)
         {
             return await _orderRepository.GetAllAsync(cancellationToken);
         }

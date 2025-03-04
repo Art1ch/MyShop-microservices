@@ -1,10 +1,12 @@
 ﻿using MediatR;
+using OneOf;
+using Shared.Results;
 using StoreService.Application.Contracts;
 using StoreService.Core.Entities;
 
 namespace StoreService.Application.Queries.Product.GetAll
 {
-    public class GetAllQueryHandler : IRequestHandler<GetAllQuery, List<ProductEntity>>
+    public class GetAllQueryHandler : IRequestHandler<GetAllQuery, OneOf<Success<List<ProductEntity>>, Failed>>
     {
         private IProductRepository _productRepository;
 
@@ -13,7 +15,7 @@ namespace StoreService.Application.Queries.Product.GetAll
             _productRepository = productRepository;
         }
 
-        public async Task<List<ProductEntity>> Handle(GetAllQuery request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<List<ProductEntity>>, Failed>> Handle(GetAllQuery request, CancellationToken cancellationToken)
         {
             return await _productRepository.GetAllAsync();
         }

@@ -7,6 +7,7 @@ using StoreService.Application.Contracts;
 using StoreService.Application.Queries.Basket.GetBasketById;
 using StoreService.Application.Queries.Product.GetProductById;
 using StoreService.Core.Entities;
+using System.Collections.Generic;
 
 namespace StoreService.API.Controllers
 {
@@ -22,60 +23,64 @@ namespace StoreService.API.Controllers
             _basketRepository = basketRepository;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Test()
-        {
-            var basket = new BasketEntity()
-            {
-                Id = Guid.NewGuid(),
-                Price = 0,
-                Products = new List<ProductEntity>()
-            };
-            await _basketRepository.CreateBasketAsync(basket);
-
-            return Ok(basket);
-        }
-
         [HttpGet("/basket/{id}")]
         public async Task<ActionResult<BasketEntity>> GetBasket(Guid id)
         {
-            var basket = await _sender.Send(new GetBasketByIdQuery(id));
-            return Ok(basket);
+            var result = await _sender.Send(new GetBasketByIdQuery(id));
+            return result.Match<ActionResult<BasketEntity>>(
+                success => Ok(success.Value),
+                failed => BadRequest(failed.Message)
+            );
         }
 
         [HttpGet("/product/{id}")]
         public async Task<ActionResult<ProductEntity>> GetProduct(Guid id)
         {
-            var product = await _sender.Send(new GetProductByIdQuery(id));
-            return Ok(product);
+            var result = await _sender.Send(new GetProductByIdQuery(id));
+            return result.Match<ActionResult<ProductEntity>>(
+                success => Ok(success.Value),
+                failed => BadRequest(failed.Message)
+            );
         }
 
         [HttpGet("/baskets")]
         public async Task<ActionResult<List<BasketEntity>>> GetBaskets()
         {
             var result = await _sender.Send(new Application.Queries.Basket.GetAll.GetAllQuery());
-            return Ok(result);
+            return result.Match<ActionResult<List<BasketEntity>>>(
+                success => Ok(success.Value),
+                failed => BadRequest(failed.Message)
+            );
         }
 
         [HttpGet("/products")]
         public async Task<ActionResult<List<ProductEntity>>> GetProducts()
         {
             var result = await _sender.Send(new Application.Queries.Product.GetAll.GetAllQuery());
-            return Ok(result);
+            return result.Match<ActionResult<List<ProductEntity>>> (
+                success => Ok(success.Value),
+                failed => BadRequest(failed.Message)
+            );
         }
 
         [HttpPost("/create_product")]
         public async Task<IActionResult> CreateProduct([FromBody] CreateProductCommand command)
         {
-            await _sender.Send(command);
-            return Ok();
+            var result = await _sender.Send(command);
+            return result.Match<IActionResult>(
+                success => Ok(success.Value),
+                failed => BadRequest(failed.Message)
+            );
         }
 
         [HttpPost("/add_product")]
         public async Task<IActionResult> AddProduct([FromBody] AddProductToBasketCommand command)
         {
-            await _sender.Send(command);
-            return Ok();
+            var result = await _sender.Send(command);
+            return result.Match<IActionResult>(
+                success => Ok(success),
+                failed => BadRequest(failed.Message)
+            );
         }
 
         [HttpPost("/make_order")]

@@ -1,14 +1,16 @@
-﻿using UserService.Core.Entities;
+﻿using OneOf;
+using Shared.Results;
+using UserService.Core.Entities;
 
 namespace UserService.Application.Contracts.Repository
 {
     public interface IUserRepository
     {
-        Task<Guid> CreateUserAsync(UserEntity user, CancellationToken cancellationToken);
-        Task DeleteUserAsync(Guid id, CancellationToken cancellationToken);
-        Task<Guid> UpdateUserAsync(UserEntity user, CancellationToken cancellationToken);
-        Task<List<UserEntity>> GetAllAsync(CancellationToken cancellationToken);
-        Task<UserEntity?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken);
-        Task<UserEntity?> GetUserByNameAsync(string name, CancellationToken cancellationToken);
+        Task<OneOf<Success<Guid>, Failed>> CreateUserAsync(UserEntity user, CancellationToken cancellationToken);
+        Task<OneOf<Success, Failed>> DeleteUserAsync(Guid id, CancellationToken cancellationToken);
+        Task<OneOf<Success<Guid>, Failed>> UpdateUserAsync(UserEntity user, CancellationToken cancellationToken);
+        Task<OneOf<Success<List<UserEntity>>, Failed>> GetAllAsync(CancellationToken cancellationToken);
+        Task<OneOf<Success<UserEntity>, Failed>> GetUserByIdAsync(Guid id, CancellationToken cancellationToken);
+        Task<OneOf<Success<UserEntity>, Failed>> GetUserByNameAsync(string name, CancellationToken cancellationToken);
     }
 }

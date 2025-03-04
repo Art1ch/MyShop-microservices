@@ -1,12 +1,14 @@
 ﻿using EventBus.EventBus.Interface;
 using EventBus.Events.User.Create;
 using MediatR;
+using OneOf;
+using Shared.Results;
 using UserService.Application.Contracts.Repository;
 using UserService.Core.Entities;
 
 namespace UserService.Application.Commands.CreateUser
 {
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, OneOf<Success<Guid>, Failed>>
     {
         private readonly IUserRepository _userRepository;
         private readonly IEventBus _eventBus;
@@ -17,7 +19,7 @@ namespace UserService.Application.Commands.CreateUser
             _eventBus = eventBus;
         }
 
-        public async Task<Guid> Handle(CreateUserCommand request, CancellationToken cancellationToken=default)
+        public async Task<OneOf<Success<Guid>, Failed>> Handle(CreateUserCommand request, CancellationToken cancellationToken=default)
         {
             var currentTime = DateTime.UtcNow;
             var user = new UserEntity()

@@ -1,10 +1,12 @@
 ﻿using MediatR;
+using OneOf;
+using Shared.Results;
 using StoreService.Application.Commands.Basket.AddProduct;
 using StoreService.Application.Contracts;
 
 namespace StoreService.Application.Commands.Basket.AddProductToBasket
 {
-    public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBasketCommand>
+    public class AddProductToBasketCommandHandler : IRequestHandler<AddProductToBasketCommand, OneOf<Success, Failed>>
     {
         private readonly IBasketRepository _basketRepository;
 
@@ -13,9 +15,9 @@ namespace StoreService.Application.Commands.Basket.AddProductToBasket
             _basketRepository = basketRepository;
         }
 
-        public async Task Handle(AddProductToBasketCommand request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success, Failed>> Handle(AddProductToBasketCommand request, CancellationToken cancellationToken)
         {
-            await _basketRepository.AddProductToBasket(request.BasketId, request.ProductId, request.Amount, cancellationToken);
+            return await _basketRepository.AddProductToBasket(request.BasketId, request.ProductId, request.Amount, cancellationToken);
         }
     }
 }

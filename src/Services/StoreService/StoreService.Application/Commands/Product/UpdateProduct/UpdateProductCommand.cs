@@ -1,8 +1,10 @@
 ﻿using MediatR;
+using OneOf;
+using Shared.Results;
 
 namespace StoreService.Application.Commands.Product.UpdateProduct
 {
-    public class UpdateProductCommand : IRequest<Guid>
+    public class UpdateProductCommand : IRequest<OneOf<Success<Guid>, Failed>>
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

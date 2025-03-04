@@ -19,14 +19,21 @@ namespace OrderService.API.Controllers
         [HttpGet("/order/{id}")]
         public async Task<IActionResult> GetOrder(Guid id)
         {
-            await _sender.Send(new GetOrderByIdQuery(id));
-            return Ok();
+            var result = await _sender.Send(new GetOrderByIdQuery(id));
+            return result.Match<IActionResult>(
+                success => Ok(success.Value),
+                failed => BadRequest(failed.Message)
+            );
         }
 
         [HttpGet("/orders")]
         public async Task<ActionResult<List<OrderEntity>>> GetOrders()
         {
-            return await _sender.Send(new GetAllQuery());
+            var result = await _sender.Send(new GetAllQuery());
+            return result.Match<ActionResult<List<OrderEntity>>>(
+                success => Ok(success.Value),
+                failed => BadRequest(failed.Message)
+            );
         }
     }
 }

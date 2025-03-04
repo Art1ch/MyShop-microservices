@@ -1,9 +1,11 @@
 ﻿using MediatR;
+using OneOf;
+using Shared.Results;
 using UserService.Application.Contracts.Repository;
 
 namespace UserService.Application.Commands.DeleteUser
 {
-    public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand>
+    public class DeleteUserCommandHandler : IRequestHandler<DeleteUserCommand, OneOf<Success, Failed>>
     {
         private readonly IUserRepository _userRepository;
 
@@ -11,10 +13,11 @@ namespace UserService.Application.Commands.DeleteUser
         {
             _userRepository = userRepository;
         }
-        public async Task Handle(DeleteUserCommand request, CancellationToken cancellationToken = default)
+        public async Task<OneOf<Success, Failed>> Handle(DeleteUserCommand request, CancellationToken cancellationToken = default)
         {
             
-            await _userRepository.DeleteUserAsync(request.Id, cancellationToken);
+            return await _userRepository.DeleteUserAsync(request.Id, cancellationToken);
         }
+
     }
 }
