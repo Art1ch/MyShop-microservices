@@ -2,11 +2,12 @@
 using OneOf;
 using Shared.Results;
 using UserService.Application.Contracts.Repository;
+using UserService.Application.Responses.CommandsResponses;
 using UserService.Core.Entities;
 
 namespace UserService.Application.Commands.UpdateUser
 {
-    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, OneOf<Success<Guid>, Failed>>
+    public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, OneOf<Success<UpdateUserResponse>, Failed>>
     {
         private readonly IUserRepository _userRepository;
 
@@ -14,7 +15,7 @@ namespace UserService.Application.Commands.UpdateUser
         {
             _userRepository = userRepository;
         }
-        public async Task<OneOf<Success<Guid>, Failed>> Handle(UpdateUserCommand request, CancellationToken cancellationToken = default)
+        public async Task<OneOf<Success<UpdateUserResponse>, Failed>> Handle(UpdateUserCommand request, CancellationToken cancellationToken = default)
         {
             var user = new UserEntity()
             {

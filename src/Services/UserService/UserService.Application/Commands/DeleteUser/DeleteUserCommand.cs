@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using OneOf;
 using Shared.Results;
+using UserService.Application.Responses.CommandsResponses;
 
 namespace UserService.Application.Commands.DeleteUser
 {
-    public class DeleteUserCommand : IRequest<OneOf<Success, Failed>>
+    public class DeleteUserCommand : IRequest<OneOf<Success<DeleteUserResponse>, Failed>>
     {
         public Guid Id { get; set; }
 

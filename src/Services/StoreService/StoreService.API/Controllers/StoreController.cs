@@ -3,11 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using StoreService.Application.Commands.Basket.AddProduct;
 using StoreService.Application.Commands.Basket.MakeOrder;
 using StoreService.Application.Commands.Product.CreateProduct;
-using StoreService.Application.Contracts;
 using StoreService.Application.Queries.Basket.GetBasketById;
 using StoreService.Application.Queries.Product.GetProductById;
 using StoreService.Core.Entities;
-using System.Collections.Generic;
 
 namespace StoreService.API.Controllers
 {
@@ -16,15 +14,13 @@ namespace StoreService.API.Controllers
     public class StoreController : ControllerBase
     {
         private readonly ISender _sender;
-        private readonly IBasketRepository _basketRepository;
-        public StoreController(ISender sender, IBasketRepository basketRepository)
+        public StoreController(ISender sender)
         {
             _sender = sender;
-            _basketRepository = basketRepository;
         }
 
         [HttpGet("/basket/{id}")]
-        public async Task<ActionResult<BasketEntity>> GetBasket(Guid id)
+        public async Task<ActionResult<BasketEntity>> GetBasket([FromQuery] Guid id)
         {
             var result = await _sender.Send(new GetBasketByIdQuery(id));
             return result.Match<ActionResult<BasketEntity>>(
@@ -34,7 +30,7 @@ namespace StoreService.API.Controllers
         }
 
         [HttpGet("/product/{id}")]
-        public async Task<ActionResult<ProductEntity>> GetProduct(Guid id)
+        public async Task<ActionResult<ProductEntity>> GetProduct([FromQuery] Guid id)
         {
             var result = await _sender.Send(new GetProductByIdQuery(id));
             return result.Match<ActionResult<ProductEntity>>(
