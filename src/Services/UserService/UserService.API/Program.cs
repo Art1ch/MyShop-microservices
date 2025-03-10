@@ -1,14 +1,4 @@
-using Microsoft.EntityFrameworkCore;
-using UserService.Application.Contracts.Repository;
-using UserService.Infrastructure.Context;
-using UserService.Infrastructure.Repository;
 using MediatR;
-using MassTransit;
-using Shared.MessageBrokerSettings;
-using EventBus.EventBus.Interface;
-using EventBus.EventBus.Implementations;
-using MassTransit.Configuration;
-using Microsoft.Extensions.Options;
 using UserService.API.Extensions;
 
 
