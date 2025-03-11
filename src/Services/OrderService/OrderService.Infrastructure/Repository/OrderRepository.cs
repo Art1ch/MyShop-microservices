@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OneOf;
 using OrderService.Application.Contracts;
+using OrderService.Application.Responses.QueriesResponses;
 using OrderService.Core.Entities;
 using OrderService.Infrastructure.Context;
 using Shared.Results;
@@ -30,18 +31,26 @@ namespace OrderService.Infrastructure.Repository
             return new Success();
         }
 
-        public async Task<OneOf<Success<List<OrderEntity>>, Failed>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<OneOf<Success<GetAllOrdersResponse>, Failed>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             var orders = await _context.Orders.ToListAsync(cancellationToken);
-            if (orders is null) { return new Failed(); }
-            return new Success<List<OrderEntity>>(orders);
+            if (orders is null)
+            { 
+                return new Failed();
+            }
+            var response = new GetAllOrdersResponse(orders);
+            return new Success<GetAllOrdersResponse>(response);
         }
 
-        public async Task<OneOf<Success<OrderEntity>, Failed>> GetOrderByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<OneOf<Success<GetOrderByIdResponse>, Failed>> GetOrderByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var order = await _context.Orders.FirstOrDefaultAsync(o => o.Id == id, cancellationToken);
-            if (order is null) { return new Failed(); }
-            return new Success<OrderEntity>(order);
+            if (order is null) 
+            { 
+                return new Failed();
+            }
+            var response = new GetOrderByIdResponse(order);
+            return new Success<GetOrderByIdResponse>(response);
         }
 
         public async Task<OneOf<Success<Guid>, Failed>> UpdateOrderAsync(OrderEntity orderEntity, CancellationToken cancellationToken = default)

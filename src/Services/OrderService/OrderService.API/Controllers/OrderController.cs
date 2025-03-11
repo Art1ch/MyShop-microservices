@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using OrderService.Application.Queries.GetAll;
 using OrderService.Application.Queries.GetOrderById;
-using OrderService.Core.Entities;
+using OrderService.Application.Responses.QueriesResponses;
 
 namespace OrderService.API.Controllers
 {
@@ -17,20 +17,20 @@ namespace OrderService.API.Controllers
         }
 
         [HttpGet("/order/{id}")]
-        public async Task<IActionResult> GetOrder(Guid id)
+        public async Task<ActionResult<GetOrderByIdResponse>> GetOrder([FromQuery]Guid id)
         {
             var result = await _sender.Send(new GetOrderByIdQuery(id));
-            return result.Match<IActionResult>(
+            return result.Match<ActionResult<GetOrderByIdResponse>>(
                 success => Ok(success.Value),
                 failed => BadRequest(failed.Message)
             );
         }
 
         [HttpGet("/orders")]
-        public async Task<ActionResult<List<OrderEntity>>> GetOrders()
+        public async Task<ActionResult<GetAllOrdersResponse>> GetOrders()
         {
             var result = await _sender.Send(new GetAllQuery());
-            return result.Match<ActionResult<List<OrderEntity>>>(
+            return result.Match<ActionResult<GetAllOrdersResponse>>(
                 success => Ok(success.Value),
                 failed => BadRequest(failed.Message)
             );
