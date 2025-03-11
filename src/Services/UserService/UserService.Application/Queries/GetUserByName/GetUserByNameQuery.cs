@@ -1,11 +1,11 @@
 ﻿using MediatR;
 using OneOf;
 using Shared.Results;
-using UserService.Core.Entities;
+using UserService.Application.Responses.QueriesResponses;
 
 namespace UserService.Application.Queries.GetUserByName
 {
-    public class GetUserByNameQuery : IRequest<OneOf<Success<UserEntity>, Failed>>
+    public class GetUserByNameQuery : IRequest<OneOf<Success<GetUserByNameResponse>, Failed>>
     {
         public string Name { get; set; }
 

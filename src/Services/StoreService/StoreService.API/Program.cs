@@ -26,6 +26,7 @@ namespace StoreService.API
             builder.AddRepositories();
             builder.AddEventBus();
             builder.AddMediatR();
+            builder.AddValidation();
             builder.AddMessageBroker();
 
             var app = builder.Build();

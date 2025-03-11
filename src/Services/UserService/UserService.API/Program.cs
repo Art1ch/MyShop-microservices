@@ -18,6 +18,7 @@ namespace UserService.API
             builder.AddRepository();
             builder.AddEventBus();
             builder.AddMediatR();
+            builder.AddValidation();
             builder.AddMessageBroker();
 
             var app = builder.Build();

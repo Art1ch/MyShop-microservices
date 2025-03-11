@@ -2,11 +2,11 @@
 using OneOf;
 using Shared.Results;
 using StoreService.Application.Contracts;
-using StoreService.Core.Entities;
+using StoreService.Application.Repsonses.QueriesResponses.Product;
 
 namespace StoreService.Application.Queries.Product.GetAll
 {
-    public class GetAllQueryHandler : IRequestHandler<GetAllQuery, OneOf<Success<List<ProductEntity>>, Failed>>
+    public class GetAllQueryHandler : IRequestHandler<GetAllQuery, OneOf<Success<GetAllProductsResponse>, Failed>>
     {
         private IProductRepository _productRepository;
 
@@ -15,7 +15,7 @@ namespace StoreService.Application.Queries.Product.GetAll
             _productRepository = productRepository;
         }
 
-        public async Task<OneOf<Success<List<ProductEntity>>, Failed>> Handle(GetAllQuery request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<GetAllProductsResponse>, Failed>> Handle(GetAllQuery request, CancellationToken cancellationToken)
         {
             return await _productRepository.GetAllAsync();
         }

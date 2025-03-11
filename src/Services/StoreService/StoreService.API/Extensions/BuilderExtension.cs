@@ -1,5 +1,6 @@
 ﻿using EventBus.EventBus.Implementations;
 using EventBus.EventBus.Interface;
+using FluentValidation;
 using MassTransit;
 using Microsoft.Extensions.Options;
 using Shared.MessageBrokerSettings;
@@ -54,6 +55,13 @@ namespace StoreService.API.Extensions
 
                 options.RegisterServicesFromAssemblies(typeof(StoreService.Application.Commands.Basket.MakeOrder.MakeOrderCommandHandler).Assembly);
             });
+        }
+        public static void AddValidation(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddValidatorsFromAssembly(typeof(StoreService.Application.Commands.Basket.AddProductToBasket.AddProductToBasketCommandValidation).Assembly);
+
+            builder.Services.AddValidatorsFromAssembly(typeof(StoreService.Application.Commands.Product.CreateProduct.CreateProductCommandValidator).Assembly);
+            builder.Services.AddValidatorsFromAssembly(typeof(StoreService.Application.Commands.Product.UpdateProduct.UpdateProductCommandValidator).Assembly);
         }
 
         public static void AddMessageBroker(this WebApplicationBuilder builder)

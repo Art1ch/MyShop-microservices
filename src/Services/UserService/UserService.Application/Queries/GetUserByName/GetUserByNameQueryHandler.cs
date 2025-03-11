@@ -2,11 +2,11 @@
 using OneOf;
 using Shared.Results;
 using UserService.Application.Contracts.Repository;
-using UserService.Core.Entities;
+using UserService.Application.Responses.QueriesResponses;
 
 namespace UserService.Application.Queries.GetUserByName
 {
-    public class GetUserByNameQueryHandler : IRequestHandler<GetUserByNameQuery, OneOf<Success<UserEntity>, Failed>>
+    public class GetUserByNameQueryHandler : IRequestHandler<GetUserByNameQuery, OneOf<Success<GetUserByNameResponse>, Failed>>
     {
         private readonly IUserRepository _userRepository;
 
@@ -15,7 +15,7 @@ namespace UserService.Application.Queries.GetUserByName
             _userRepository = userRepository;
         }
 
-        public async Task<OneOf<Success<UserEntity>, Failed>> Handle(GetUserByNameQuery request, CancellationToken cancellationToken)
+        public async Task<OneOf<Success<GetUserByNameResponse>, Failed>> Handle(GetUserByNameQuery request, CancellationToken cancellationToken)
         {
             return await _userRepository.GetUserByNameAsync(request.Name, cancellationToken);
         }

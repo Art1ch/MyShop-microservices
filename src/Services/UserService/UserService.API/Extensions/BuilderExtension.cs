@@ -1,5 +1,6 @@
 ﻿using EventBus.EventBus.Implementations;
 using EventBus.EventBus.Interface;
+using FluentValidation;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -44,6 +45,12 @@ namespace UserService.API.Extensions
                 options.RegisterServicesFromAssembly(typeof(UserService.Application.Queries.GetUserById.GetUserByIdQueryHandler).Assembly);
                 options.RegisterServicesFromAssembly(typeof(UserService.Application.Queries.GetUserByName.GetUserByNameQueryHandler).Assembly);
             });
+        }
+
+        public static void AddValidation(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddValidatorsFromAssembly(typeof(UserService.Application.Commands.CreateUser.CreateUserCommandValidator).Assembly);
+            builder.Services.AddValidatorsFromAssembly(typeof(UserService.Application.Commands.UpdateUser.UpdateUserCommandValidator).Assembly);
         }
 
         public static void AddMessageBroker(this WebApplicationBuilder builder)
