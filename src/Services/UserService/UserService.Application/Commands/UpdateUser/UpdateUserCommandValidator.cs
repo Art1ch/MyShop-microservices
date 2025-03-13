@@ -11,10 +11,10 @@ namespace UserService.Application.Commands.UpdateUser
                 .MinimumLength(2).WithMessage("Minimal name length is 2 characters")
                 .MaximumLength(30).WithMessage("Maximal name length is 30 characters");
 
-            RuleFor(x => x.Age)
-                .NotEmpty().WithMessage("Age is empty")
-                .GreaterThanOrEqualTo(18).WithMessage("Minimal age is 18 years")
-                .LessThanOrEqualTo(110).WithMessage("Maximal age is 110 years");
+            RuleFor(x => x.Password)
+                .NotEmpty().WithMessage("Password is empty")
+                .MinimumLength(8).WithMessage("Minimal name length is 8 characters")
+                .MaximumLength(20).WithMessage("Maximal name length is 20 characters");
         }
     }
 }

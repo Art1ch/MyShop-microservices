@@ -69,7 +69,7 @@ namespace UserService.Infrastructure.Repository
             .ExecuteUpdateAsync
             (
             s => s.SetProperty(u => u.Name, user.Name)
-                  .SetProperty(u => u.Age, user.Age)
+                  .SetProperty(u => u.Password, user.Password)
                   .SetProperty(u => u.ModifiedTime, DateTime.UtcNow),
             cancellationToken
             );

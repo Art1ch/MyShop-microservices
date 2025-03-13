@@ -9,13 +9,13 @@ namespace UserService.Application.Commands.UpdateUser
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public int Age { get; set; }
+        public string Password  { get; set; }
 
-        public UpdateUserCommand(Guid id, string name, int age)
+        public UpdateUserCommand(Guid id, string name, string password)
         {
             Id = id;
             Name = name;
-            Age = age;
+            Password = password;
         }
     }
 }

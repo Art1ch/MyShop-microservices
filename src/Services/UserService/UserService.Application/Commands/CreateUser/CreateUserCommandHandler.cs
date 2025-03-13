@@ -45,7 +45,7 @@ namespace UserService.Application.Commands.CreateUser
             {
                 Id = Guid.NewGuid(),
                 Name = request.Name,
-                Age = request.Age,
+                Password = request.Password,
                 CreatedTime = currentTime,
                 ModifiedTime = currentTime,
             };

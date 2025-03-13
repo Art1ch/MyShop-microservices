@@ -40,7 +40,7 @@ namespace UserService.Application.Commands.UpdateUser
             {
                 Id = request.Id,
                 Name = request.Name,
-                Age = request.Age,
+                Password = request.Password,
             };
             return await _userRepository.UpdateUserAsync(user, cancellationToken);
         }

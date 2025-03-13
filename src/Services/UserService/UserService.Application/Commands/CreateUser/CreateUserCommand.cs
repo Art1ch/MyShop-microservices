@@ -8,12 +8,12 @@ namespace UserService.Application.Commands.CreateUser
     public class CreateUserCommand : IRequest<OneOf<Success<CreateUserResponse>, Failed>>
     {
         public string Name { get; set; }
-        public int? Age { get; set; }
+        public string Password { get; set; }
 
-        public CreateUserCommand(string name, int? age)
+        public CreateUserCommand(string name, string password)
         {
             Name = name;
-            Age = age;
+            Password = password;
         }
     }
 }
