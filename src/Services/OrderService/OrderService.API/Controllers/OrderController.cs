@@ -7,7 +7,7 @@ using OrderService.Application.Responses.QueriesResponses;
 namespace OrderService.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class OrderController : ControllerBase
     {
         private readonly ISender _sender;
@@ -16,7 +16,7 @@ namespace OrderService.API.Controllers
             _sender = sender;
         }
 
-        [HttpGet("/order/{id}")]
+        [HttpGet]
         public async Task<ActionResult<GetOrderByIdResponse>> GetOrder([FromQuery]Guid id)
         {
             var result = await _sender.Send(new GetOrderByIdQuery(id));
@@ -26,7 +26,7 @@ namespace OrderService.API.Controllers
             );
         }
 
-        [HttpGet("/orders")]
+        [HttpGet("orders")]
         public async Task<ActionResult<GetAllOrdersResponse>> GetOrders()
         {
             var result = await _sender.Send(new GetAllQuery());

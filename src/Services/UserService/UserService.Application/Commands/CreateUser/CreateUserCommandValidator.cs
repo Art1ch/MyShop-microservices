@@ -13,8 +13,8 @@ namespace UserService.Application.Commands.CreateUser
 
             RuleFor(x => x.Password)
                 .NotEmpty().WithMessage("Password is empty")
-                .MinimumLength(8).WithMessage("Minimal name length is 8 characters")
-                .MaximumLength(20).WithMessage("Maximal name length is 20 characters");
+                .MinimumLength(8).WithMessage("Minimal password length is 8 characters")
+                .MaximumLength(20).WithMessage("Maximal Password length is 20 characters");
         }
     }
 }

@@ -13,7 +13,7 @@ using StoreService.Application.Repsonses.QueriesResponses.Product;
 namespace StoreService.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class StoreController : ControllerBase
     {
         private readonly ISender _sender;
@@ -22,7 +22,7 @@ namespace StoreService.API.Controllers
             _sender = sender;
         }
 
-        [HttpGet("/basket/{id}")]
+        [HttpGet("basket")]
         public async Task<ActionResult<GetBasketByIdResponse>> GetBasket([FromQuery] Guid id)
         {
             var result = await _sender.Send(new GetBasketByIdQuery(id));
@@ -32,7 +32,7 @@ namespace StoreService.API.Controllers
             );
         }
 
-        [HttpGet("/product/{id}")]
+        [HttpGet("product")]
         public async Task<ActionResult<GetProductByIdResponse>> GetProduct([FromQuery] Guid id)
         {
             var result = await _sender.Send(new GetProductByIdQuery(id));
@@ -42,7 +42,7 @@ namespace StoreService.API.Controllers
             );
         }
 
-        [HttpGet("/baskets")]
+        [HttpGet("baskets")]
         public async Task<ActionResult<GetAllProductsResponse>> GetBaskets()
         {
             var result = await _sender.Send(new Application.Queries.Basket.GetAll.GetAllQuery());
@@ -52,7 +52,7 @@ namespace StoreService.API.Controllers
             );
         }
 
-        [HttpGet("/products")]
+        [HttpGet("products")]
         public async Task<ActionResult<GetAllProductsResponse>> GetProducts()
         {
             var result = await _sender.Send(new Application.Queries.Product.GetAll.GetAllQuery());
@@ -62,7 +62,7 @@ namespace StoreService.API.Controllers
             );
         }
 
-        [HttpPost("/create_product")]
+        [HttpPost("create_product")]
         public async Task<ActionResult<CreateProductResponse>> CreateProduct([FromBody] CreateProductCommand command)
         {
             var result = await _sender.Send(command);
@@ -72,7 +72,7 @@ namespace StoreService.API.Controllers
             );
         }
 
-        [HttpPost("/add_product")]
+        [HttpPost("add_product")]
         public async Task<ActionResult<AddProductToBasketResponse>> AddProduct([FromBody] AddProductToBasketCommand command)
         {
             var result = await _sender.Send(command);
@@ -82,7 +82,7 @@ namespace StoreService.API.Controllers
             );
         }
 
-        [HttpPost("/make_order")]
+        [HttpPost("make_order")]
         public async Task<ActionResult<MakeOrderResponse>> MakeOrder([FromBody] MakeOrderCommand command)
         {
             var result = await _sender.Send(command);

@@ -1,7 +1,19 @@
 services:
+
+  gateway:
+    image: ${DOCKER_REGISTRY-}gateway
+    build:
+      context: .
+      dockerfile: Gateway/Gateway/Dockerfile
+    ports:
+        - 8080:8080
+        - 8081:8081 
+    networks:
+        - backend
+ 
   storeservice.api:
     image: ${DOCKER_REGISTRY-}storeserviceapi
-    container_name: store-api
+    container_name: storeservice
     build:
       context: .
       dockerfile: Services/StoreService/StoreService.API/Dockerfile
@@ -10,19 +22,22 @@ services:
       - "5003:5003"
     depends_on:
       - store.db
+    networks:
+        - backend
 
   store.db:
     image: mongo:latest
-    container_name: store-db
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=pass 
     ports:
       - 27017:27017
+    networks:
+        - backend
 
   userservice.api:
     image: ${DOCKER_REGISTRY-}userserviceapi
-    container_name: user-api
+    container_name: userservice
     build:
       context: .
       dockerfile: Services/UserService/UserService.API/Dockerfile
@@ -31,20 +46,23 @@ services:
       - "5001:5001"
     depends_on:
       - user.db
+    networks:
+        - backend
 
   user.db:
     image: postgres:latest
-    container_name: user-db
     environment:
       - POSTGRES_DB=user-database
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=pass
     ports:
       - 5432:5432
+    networks:
+        - backend
 
   orderservice.api:
     image: ${DOCKER_REGISTRY-}orderserviceapi
-    container_name: order-api
+    container_name: orderservice
     build:
       context: .
       dockerfile: Services/OrderService/OrderService.API/Dockerfile
@@ -53,16 +71,19 @@ services:
       - "5005:5005" 
     depends_on:
       - order.db
-    
+    networks:
+        - backend
+
   order.db:
     image: postgres:latest
-    container_name: order-db
     environment:
       - POSTGRES_DB=order-database
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=pass
     ports:
       - 5433:5432
+    networks:
+        - backend
    
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -74,3 +95,12 @@ services:
     ports:
         - 5672:5672
         - 15672:15672
+    networks:
+        - backend
+
+networks:
+  backend:
+    name: backend
+    driver: bridge
+
+

@@ -12,7 +12,7 @@ using UserService.Application.Responses.QueriesResponses;
 namespace UserService.API.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UserController : Controller
     {
         private readonly ISender _sender;
@@ -21,7 +21,7 @@ namespace UserService.API.Controllers
             _sender = sender;
         }
 
-        [HttpGet("/users")]
+        [HttpGet("users")]
         public async Task<ActionResult<GetAllResponse>> GetAllUsers()
         {
             var result = await _sender.Send(new GetAllQuery());
@@ -31,7 +31,7 @@ namespace UserService.API.Controllers
             );
         }
 
-        [HttpGet("/userbyid/{id}")]
+        [HttpGet("userbyid")]
         public async Task<ActionResult<GetUserByIdResponse>> GetUserById([FromQuery] Guid id)
         {
             var result = await _sender.Send(new GetUserByIdQuery(id));
@@ -41,7 +41,7 @@ namespace UserService.API.Controllers
             );
         }
 
-        [HttpGet("/userbyname/{name}")]
+        [HttpGet("userbyname")]
         public async Task<ActionResult<GetUserByNameResponse>> GetUserByName([FromQuery] string name)
         {
             var result = await _sender.Send(new GetUserByNameQuery(name));
@@ -61,7 +61,7 @@ namespace UserService.API.Controllers
             );
         }
 
-        [HttpPatch]
+        [HttpPut]
         public async Task<ActionResult<UpdateUserResponse>> UpdateUser([FromBody] UpdateUserCommand command)
         {
             var result = await _sender.Send(command);
